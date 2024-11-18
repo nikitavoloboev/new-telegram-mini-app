@@ -12,6 +12,7 @@ import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary"
 import { NotFound } from "~/components/NotFound"
 import { seo } from "~/lib/seo"
 import appCss from "~/styles/app.css?url"
+import { init } from "@telegram-apps/sdk-react"
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -63,6 +64,7 @@ export const Route = createRootRouteWithContext<{
 })
 
 function RootComponent() {
+  init()
   return (
     <RootDocument>
       <Outlet />
