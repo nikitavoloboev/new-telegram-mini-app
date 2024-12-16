@@ -9,6 +9,9 @@ export default defineConfig({
       }),
     ],
   },
+  server: {
+    preset: "vercel",
+  },
   tsr: {
     customScaffolding: {
       routeTemplate: [

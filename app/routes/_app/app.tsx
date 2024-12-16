@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { useLaunchParams } from "@telegram-apps/sdk-react"
+import { createFileRoute } from '@tanstack/react-router'
+import { useLaunchParams } from '@telegram-apps/sdk-react'
 
 function RouteComponent() {
   // const lp = useLaunchParams()
@@ -12,6 +12,6 @@ function RouteComponent() {
   )
 }
 
-export const Route = createFileRoute("/app/")({
+export const Route = createFileRoute('/_app/app')({
   component: RouteComponent,
 })

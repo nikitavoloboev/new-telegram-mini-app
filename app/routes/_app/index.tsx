@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute } from '@tanstack/react-router'
 
 function RouteComponent() {
   return (
@@ -8,6 +8,6 @@ function RouteComponent() {
   )
 }
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/_app/')({
   component: RouteComponent,
 })
