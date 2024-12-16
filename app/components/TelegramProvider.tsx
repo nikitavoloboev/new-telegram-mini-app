@@ -1,7 +1,7 @@
 import * as TelegramUI from "@telegram-apps/telegram-ui"
 const { AppRoot } = TelegramUI
 
-// import "@telegram-apps/telegram-ui/dist/styles.css"
+import "@telegram-apps/telegram-ui/dist/styles.css"
 import { PropsWithChildren, useEffect } from "react"
 
 // mock environment in case, we are outside Telegram
