@@ -17,11 +17,13 @@
     "@tanstack/react-router-with-query": "^1.102.0",
     "@tanstack/router-devtools": "^1.102.0",
     "@tanstack/start": "^1.102.0",
+    "@telegram-apps/sdk-react": "^3.0.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "redaxios": "^0.5.1",
     "tailwind-merge": "^3.0.1",
-    "vinxi": "0.5.3"
+    "vinxi": "0.5.3",
+    "vite-plugin-node-polyfills": "^0.23.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
