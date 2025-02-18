@@ -1,11 +1,10 @@
 import {
   backButton,
   viewport,
-  themeParams,
   miniApp,
   initData,
-  init as initSDK,
   setDebug,
+  init as initSDK,
 } from "@telegram-apps/sdk-react"
 
 /**
@@ -17,34 +16,48 @@ export function init(debug: boolean): void {
 
   // Initialize special event handlers for Telegram Desktop, Android, iOS, etc.
   // Also, configure the package.
-  initSDK()
 
-  // Add Eruda if needed.
-  debug &&
-    import("eruda").then((lib) => lib.default.init()).catch(console.error)
-
-  // Check if all required components are supported.
-  if (!backButton.isSupported() || !miniApp.isSupported()) {
-    throw new Error("ERR_NOT_SUPPORTED")
+  // Without a try catch block return sdk error (?)
+  try {
+    initSDK()
+  } catch (e) {
+    console.log(e)
   }
 
   // Mount all components used in the project.
-  backButton.mount()
-  miniApp.mount()
-  themeParams.mount()
+  backButton.isSupported() && backButton.mount()
   initData.restore()
+
   void viewport
     .mount()
     .catch((e) => {
       console.error("Something went wrong mounting the viewport", e)
     })
-    .then(() => {
+    .then(async () => {
       viewport.bindCssVars()
+      if (viewport.requestFullscreen.isAvailable()) {
+        await viewport.requestFullscreen()
+      }
     })
 
-  // Define components-related CSS variables.
-  if (!miniApp.isCssVarsBound && !themeParams.isCssVarsBound) {
-    miniApp.bindCssVars()
-    themeParams.bindCssVars()
+  void miniApp
+    .mount()
+    .catch((e) => {
+      console.error("Something went wrong mounting the miniApp", e)
+    })
+    .then(async () => {
+      miniApp.bindCssVars()
+    })
+
+  const webApp = (window as any)?.Telegram?.WebApp
+  if (webApp) {
+    try {
+      webApp.disableVerticalSwipes()
+    } catch (e) {
+      console.log("Error requesting fullscreen", e)
+    }
   }
+  // Add Eruda if needed.
+  debug &&
+    import("eruda").then((lib) => lib.default.init()).catch(console.error)
 }

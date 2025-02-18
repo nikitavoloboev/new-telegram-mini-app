@@ -1,36 +1,89 @@
-import { mockTelegramEnv, isTMA, emitEvent } from "@telegram-apps/sdk-react"
+import {
+  mockTelegramEnv,
+  isTMA,
+  parseInitDataQuery,
+  LaunchParams,
+  retrieveLaunchParams,
+  emitEvent,
+} from "@telegram-apps/sdk-react"
 
-// It is important, to mock the environment only for development purposes. When building the
-// application, import.meta.env.DEV will become false, and the code inside will be tree-shaken,
-// so you will not see it in your final bundle.
+// It is important, to mock the environment only for development purposes.
+// When building the application the import.meta.env.DEV will value become
+// `false` and the code inside will be tree-shaken (removed), so you will not
+// see it in your final bundle.
 if (import.meta.env.DEV) {
-  if (!(await isTMA("complete"))) {
-    const themeParams = {
-      accent_text_color: "#6ab2f2",
-      bg_color: "#17212b",
-      button_color: "#5288c1",
-      button_text_color: "#ffffff",
-      destructive_text_color: "#ec3942",
-      header_bg_color: "#17212b",
-      hint_color: "#708499",
-      link_color: "#6ab3f3",
-      secondary_bg_color: "#232e3c",
-      section_bg_color: "#17212b",
-      section_header_text_color: "#6ab3f3",
-      subtitle_text_color: "#708499",
-      text_color: "#f5f5f5",
-    } as const
+  ;(() => {
+    if (isTMA()) {
+      return
+    }
+
+    const userData = {
+      id: 99281932,
+      first_name: "Andrew",
+      last_name: "Rogue",
+      username: "rogue",
+      language_code: "en",
+      is_premium: true,
+      allows_write_to_pm: true,
+    }
+
+    const commonParams = [
+      ["user", JSON.stringify(userData)],
+      [
+        "hash",
+        "89d6079ad6762351f38c6dbbc41bb53048019256a9443988af7a48bcad16ba31",
+      ],
+      ["auth_date", "1716922846"],
+      ["start_param", "debug"],
+      ["chat_type", "sender"],
+      ["chat_instance", "8428209589180549439"],
+      ["signature", "6fbdaab833d39f54518bd5c3eb3f511d035e68cb"],
+    ]
+
     const noInsets = {
       left: 0,
       top: 0,
       bottom: 0,
       right: 0,
-    } as const
+    }
 
+    const generateTgWebAppData = () =>
+      new URLSearchParams(commonParams).toString()
+
+    // Determine which launch params should be applied. We could already
+    // apply them previously, or they may be specified on purpose using the
+    // default launch parameters transmission method.
+    let lp: LaunchParams | undefined
+    try {
+      lp = retrieveLaunchParams()
+    } catch (e) {
+      lp = {
+        tgWebAppThemeParams: {
+          accentTextColor: "#6ab2f2",
+          bgColor: "#17212b",
+          buttonColor: "#5288c1",
+          buttonTextColor: "#ffffff",
+          destructiveTextColor: "#ec3942",
+          headerBgColor: "#17212b",
+          hintColor: "#708499",
+          linkColor: "#6ab3f3",
+          secondaryBgColor: "#232e3c",
+          sectionBgColor: "#17212b",
+          sectionHeaderTextColor: "#6ab3f3",
+          subtitleTextColor: "#708499",
+          textColor: "#f5f5f5",
+        },
+        tgWebAppData: parseInitDataQuery(generateTgWebAppData()),
+        tgWebAppPlatform: "tdesktop",
+        tgWebAppVersion: "8",
+      }
+    }
     mockTelegramEnv({
       onEvent(e) {
         if (e[0] === "web_app_request_theme") {
-          return emitEvent("theme_changed", { theme_params: themeParams })
+          return emitEvent("theme_changed", {
+            theme_params: lp?.tgWebAppThemeParams,
+          })
         }
         if (e[0] === "web_app_request_viewport") {
           return emitEvent("viewport_changed", {
@@ -48,27 +101,14 @@ if (import.meta.env.DEV) {
         }
       },
       launchParams: {
-        tgWebAppThemeParams: themeParams,
-        tgWebAppData: new URLSearchParams([
-          [
-            "user",
-            JSON.stringify({
-              id: 1,
-              first_name: "Pavel",
-            }),
-          ],
-          ["hash", ""],
-          ["signature", ""],
-          ["auth_date", Date.now().toString()],
-        ]).toString(),
-        tgWebAppStartParam: "debug",
-        tgWebAppVersion: "8",
-        tgWebAppPlatform: "tdesktop",
+        tgWebAppData: generateTgWebAppData(),
+        tgWebAppPlatform: lp?.tgWebAppPlatform,
+        tgWebAppVersion: lp?.tgWebAppVersion,
+        tgWebAppThemeParams: lp?.tgWebAppThemeParams,
       },
     })
-
-    console.info(
+    console.warn(
       "⚠️ As long as the current environment was not considered as the Telegram-based one, it was mocked. Take a note, that you should not do it in production and current behavior is only specific to the development process. Environment mocking is also applied only in development mode. So, after building the application, you will not see this behavior and related warning, leading to crashing the application outside Telegram.",
     )
-  }
+  })()
 }
